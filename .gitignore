@@ -9,3 +9,4 @@ cache
 artifacts
 .vscode
 bin
+secrets.json
