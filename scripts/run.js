@@ -1,8 +1,14 @@
 const main = async () => {
-  const nftContractFactory = await hre.ethers.getContractFactory("BigNFT");
+  const nftContractFactory = await hre.ethers.getContractFactory("MathNFT");
   const nftContract = await nftContractFactory.deploy();
   await nftContract.deployed();
   console.log("Contract deployed to:", nftContract.address);
+
+  let transaction = await nftContract.makeMathNFT();
+  await transaction.wait();
+
+  transaction = await nftContract.makeMathNFT();
+  await transaction.wait();
 };
 
 const runMain = async () => {
