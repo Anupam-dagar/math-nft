@@ -10,3 +10,4 @@ artifacts
 .vscode
 bin
 secrets.json
+frontend/node_modules
