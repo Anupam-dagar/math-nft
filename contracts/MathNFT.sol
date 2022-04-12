@@ -42,11 +42,14 @@ contract MathNFT is ERC721URIStorage {
         "Scandalous"
     ];
 
+    uint256 public mintCount = 0;
+
     constructor() ERC721("MathNFT", "MATH") {
         console.log("MathNFT smart contract.");
     }
 
     function makeMathNFT() public {
+        require(mintCount < 50);
         uint256 nftId = _tokenIds.current();
 
         string memory first = pickRandomWord(nftId, "FIRST");
@@ -85,6 +88,7 @@ contract MathNFT is ERC721URIStorage {
             nftId,
             msg.sender
         );
+        mintCount++;
         emit NftMinted(msg.sender, nftId);
     }
 

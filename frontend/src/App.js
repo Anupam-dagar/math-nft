@@ -4,13 +4,14 @@ import { ethers } from "ethers";
 import mathNft from "./utils/MathNFT.json";
 
 // Constants
-const OPENSEA_LINK = "";
+const OPENSEA_LINK = "https://testnets.opensea.io/assets/";
 const TOTAL_MINT_COUNT = 50;
 
 const App = () => {
-  const CONTRACT_ADDRESS = "0xc2BDe4AdeEcA2b7D383DdFc452Cf89Ca279B7B51";
+  const CONTRACT_ADDRESS = "0xCDc8ACCf7c884C6834155e9849b4577566d18111";
 
   const [currentAccount, setCurrentAccount] = useState("");
+  const [mintCount, setMintCount] = useState(0);
 
   const renderNotConnectedContainer = () => (
     <button
@@ -35,10 +36,20 @@ const App = () => {
       console.log("Found accounts: ", account);
       setCurrentAccount(account);
       setupNftMintedEventListener();
+      setMintedNftsCount();
       return;
     }
 
     console.log("no metamask account found.");
+  };
+
+  const setMintedNftsCount = async () => {
+    const { ethereum } = window;
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, mathNft.abi, signer);
+    const nftsMintCount = await contract.mintCount();
+    setMintCount(nftsMintCount.toNumber());
   };
 
   const connectWallet = async () => {
@@ -54,6 +65,7 @@ const App = () => {
       console.log("Connected accounts:", accounts[0]);
       setCurrentAccount(accounts[0]);
       setupNftMintedEventListener();
+      setMintedNftsCount();
     } catch (error) {
       console.log(error);
     }
@@ -75,8 +87,9 @@ const App = () => {
       );
       contract.on("NftMinted", (from, tokenId) => {
         console.log(from, tokenId.toNumber());
+        setMintedNftsCount();
         alert(
-          `MathNft has been minted. Here's the link: https://testnets.opensea.io/assets/${CONTRACT_ADDRESS}/${tokenId.toNumber()}`
+          `MathNft has been minted. Here's the link: ${OPENSEA_LINK}${CONTRACT_ADDRESS}/${tokenId.toNumber()}`
         );
       });
       console.log("NftMinted listener setup complete.");
@@ -128,12 +141,17 @@ const App = () => {
           {currentAccount === "" ? (
             renderNotConnectedContainer()
           ) : (
-            <button
-              onClick={mintNft}
-              className="cta-button connect-wallet-button"
-            >
-              Mint NFT
-            </button>
+            <>
+              <h3 className="sub-text">
+                {mintCount}/{TOTAL_MINT_COUNT} Nft Minted
+              </h3>
+              <button
+                onClick={mintNft}
+                className="cta-button connect-wallet-button"
+              >
+                Mint NFT
+              </button>
+            </>
           )}
         </div>
       </div>
