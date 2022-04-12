@@ -12,6 +12,7 @@ const App = () => {
 
   const [currentAccount, setCurrentAccount] = useState("");
   const [mintCount, setMintCount] = useState(0);
+  const [isRinkeby, setIsRinkeby] = useState(true);
 
   const renderNotConnectedContainer = () => (
     <button
@@ -29,6 +30,7 @@ const App = () => {
       return;
     }
     console.log("metamask is installed", ethereum);
+    getBlockchain();
     const accounts = await ethereum.request({ method: "eth_accounts" });
 
     if (accounts.length !== 0) {
@@ -52,6 +54,18 @@ const App = () => {
     setMintCount(nftsMintCount.toNumber());
   };
 
+  const getBlockchain = async () => {
+    const { ethereum } = window;
+    let chainId = await ethereum.request({ method: "eth_chainId" });
+    console.log("Connected to chain " + chainId);
+
+    // String, hex code of the chainId of the Rinkebey test network
+    const rinkebyChainId = "0x4";
+    if (chainId !== rinkebyChainId) {
+      setIsRinkeby(false);
+    }
+  };
+
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -63,6 +77,7 @@ const App = () => {
         method: "eth_requestAccounts",
       });
       console.log("Connected accounts:", accounts[0]);
+      getBlockchain();
       setCurrentAccount(accounts[0]);
       setupNftMintedEventListener();
       setMintedNftsCount();
@@ -138,7 +153,11 @@ const App = () => {
           <p className="sub-text">
             Discover your unique mathematically generated NFT today.
           </p>
-          {currentAccount === "" ? (
+          {!isRinkeby ? (
+            <h2 className="sub-text">
+              Please connect to rinkeby network to continue
+            </h2>
+          ) : currentAccount === "" ? (
             renderNotConnectedContainer()
           ) : (
             <>
