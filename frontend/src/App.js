@@ -8,6 +8,8 @@ const OPENSEA_LINK = "";
 const TOTAL_MINT_COUNT = 50;
 
 const App = () => {
+  const CONTRACT_ADDRESS = "0xc2BDe4AdeEcA2b7D383DdFc452Cf89Ca279B7B51";
+
   const [currentAccount, setCurrentAccount] = useState("");
 
   const renderNotConnectedContainer = () => (
@@ -32,6 +34,7 @@ const App = () => {
       const account = accounts[0];
       console.log("Found accounts: ", account);
       setCurrentAccount(account);
+      setupNftMintedEventListener();
       return;
     }
 
@@ -50,13 +53,39 @@ const App = () => {
       });
       console.log("Connected accounts:", accounts[0]);
       setCurrentAccount(accounts[0]);
+      setupNftMintedEventListener();
     } catch (error) {
       console.log(error);
     }
   };
 
+  const setupNftMintedEventListener = () => {
+    try {
+      const { ethereum } = window;
+      if (!ethereum) {
+        console.log("metamask not present.");
+        return;
+      }
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        mathNft.abi,
+        signer
+      );
+      contract.on("NftMinted", (from, tokenId) => {
+        console.log(from, tokenId.toNumber());
+        alert(
+          `MathNft has been minted. Here's the link: https://testnets.opensea.io/assets/${CONTRACT_ADDRESS}/${tokenId.toNumber()}`
+        );
+      });
+      console.log("NftMinted listener setup complete.");
+    } catch (error) {
+      console.log("Metamask not present.");
+    }
+  };
+
   const mintNft = async () => {
-    const CONTRACT_ADDRESS = "0x784ad2Cd8832f658b0770f68a233a944c5bd6a94";
     try {
       const { ethereum } = window;
       if (!ethereum) {
