@@ -13,6 +13,7 @@ const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [mintCount, setMintCount] = useState(0);
   const [isRinkeby, setIsRinkeby] = useState(true);
+  const [isMinting, setIsMinting] = useState(false);
 
   const renderNotConnectedContainer = () => (
     <button
@@ -129,6 +130,7 @@ const App = () => {
         signer
       );
 
+      setIsMinting(true);
       console.log("Opening wallet to confirm transaction.");
       let transaction = await connectedContract.makeMathNFT();
       console.log("Mining NFT...");
@@ -139,6 +141,7 @@ const App = () => {
     } catch (error) {
       console.log(error);
     }
+    setIsMinting(false);
   };
 
   useEffect(() => {
@@ -170,6 +173,19 @@ const App = () => {
               >
                 Mint NFT
               </button>
+              <button
+                className="cta-button opensea-button"
+                style={{ marginLeft: "2em" }}
+              >
+                <a
+                  href="https://testnets.opensea.io/collection/mathnft-04eufojtvs"
+                  className="mint-count"
+                  style={{ textDecoration: "none" }}
+                >
+                  See Collection
+                </a>
+              </button>
+              {isMinting && <h3 className="sub-text">Minting NFT....</h3>}
             </>
           )}
         </div>
